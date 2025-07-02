@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Riwayat Skor</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div id="riwayat-container">
+        <h2>Riwayat Skor</h2>
+        <ul id="riwayat-list"></ul>
+        <button onclick="hapusSemua()">Hapus Semua</button>
+        <br><br>
+        <a href="index.html">⬅️ Kembali ke Kuis</a>
+    </div>
+    <script>
+        async function tampilkanRiwayat() {
+            const res = await fetch('http://localhost:3000/api/skor');
+            const data = await res.json();
+            const ul = document.getElementById('riwayat-list');
+            ul.innerHTML = '';
+
+            data.forEach(skor => {
+                const li = document.createElement('li');
+                li.textContent = `Skor: ${skor.skor}, Waktu: ${new Date(skor.waktu_selesai).toLocaleString()}`;
+
+                const hapusBtn = document.createElement('button');
+                hapusBtn.textContent = '❌';
+                hapusBtn.style.marginLeft = '10px';
+                hapusBtn.onclick = () => hapusSatu(skor.id);
+                li.appendChild(hapusBtn);
+
+                ul.appendChild(li);
+            });
+        }
+
+        function hapusSatu(id) {
+            fetch(`http://localhost:3000/api/skor/${id}`, { method: 'DELETE' })
+                .then(() => tampilkanRiwayat());
+        }
+
+        function hapusSemua() {
+            if (confirm('Yakin ingin hapus semua skor?')) {
+                fetch('http://localhost:3000/api/skor', { method: 'DELETE' })
+                    .then(() => tampilkanRiwayat());
+            }
+        }
+
+        tampilkanRiwayat();
+    </script>
+</body>
+
+</html>
